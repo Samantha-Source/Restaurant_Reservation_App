@@ -1,13 +1,16 @@
-/**
- * List handler for reservation resources
- */
 const service = require("./reservations.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const hasProperties = require("../utils/hasProperties");
-const hasRequiredProperties = hasProperties("first_name", "last_name", "mobile_number", "reservation_date", "reservation_time", "people");
+const hasRequiredProperties = hasProperties(
+  "first_name",
+  "last_name",
+  "mobile_number",
+  "reservation_date",
+  "reservation_time",
+  "people"
+);
 const validateTypes = require("../utils/validateReservationInput");
 const validateInputTypes = validateTypes();
-
 
 //DON'T FORGET TO REMOVE/EDIT ANY UNUSED next VARS
 //TODO remove unused code
@@ -17,137 +20,168 @@ const validateInputTypes = validateTypes();
 async function searchPhoneNum(req, res, next) {
   const { mobile_number } = req.query;
 
-  if(mobile_number){
+  if (mobile_number) {
     const listing = await service.search(mobile_number);
-    res.status(200).json({ data: listing })
+
+    res.status(200).json({ data: listing });
   } else {
     next();
   }
 }
 
-function formatDate(req, res, next) {
-  const TodayDate = new Date(Date.now());
-  const year = TodayDate.getFullYear();
-  const month = TodayDate.getMonth() + 1;
-  const day = TodayDate.getDate();
+function getTodaysDate() {
+  const todayDate = new Date(Date.now());
+  const year = todayDate.getFullYear();
+  const month = todayDate.getMonth() + 1;
+  const day = todayDate.getDate();
   const formattedDate = `${year}-${month}-${day}`;
-  return formattedDate
+  return formattedDate;
 }
 
 async function list(req, res, _next) {
-  let { date }  = req.query;
-  if(!date){
-    date = formatDate()
-  }
+  const { date } = req.query;
 
-  const listing = await service.list(date)
-  let filtered = listing.filter((eachRes) => 
-    eachRes.status !== 'finished'
-  )
-  res.json({ data: filtered})
+  !date ? (date = getTodaysDate()) : null;
+
+  const listing = await service.list(date);
+  let filtered = listing.filter((eachRes) => eachRes.status !== 'finished');
+
+  res.json({ data: filtered });
 }
 
 async function create(req, res, next) {
   const reqStatus = req.body.data.status;
-  if(reqStatus == 'seated' || reqStatus == 'finished') {
-    next({ status: 400, message: `Status is ${reqStatus}`})
+
+  if (reqStatus === 'seated' || reqStatus === 'finished') {
+    next({ status: 400, message: `Status is ${reqStatus}` });
   }
+
   const data = await service.create(req.body.data);
 
   res.status(201).json({ data });
 }
 
-async function reservationExists(req, res, next){
+async function reservationExists(req, res, next) {
   const { reservation_id } = req.params;
+
   const foundReservation = await service.read(reservation_id);
-  if(!foundReservation){
-    return next({ status:404, message:`Reservation with id ${reservation_id} not found`})
+
+  if (!foundReservation) {
+    next({
+      status: 404,
+      message: `Reservation with id ${reservation_id} not found`,
+    });
   }
+
   res.locals.foundReservation = foundReservation;
+
   next();
 }
 
-async function read(req, res, next) {
+async function read(req, res, _next) {
   const { reservation_id } = req.params;
   const foundReservation = await service.read(reservation_id);
   res.json({ data: foundReservation });
 }
 
 function validateStatusChange(req, res, next) {
-  
-    const resStatus = res.locals.foundReservation.status;
-    const updateStatus = req.body.data.status;
-  
-    if(resStatus == 'finished'){
-      next({ status: 400, message:`${res.locals.foundReservation.reservation_id} has status: ${resStatus}`})
-    }
-    if(updateStatus == 'unknown') {
-      next({ status: 400, message: `Cannot enter a status of ${updateStatus}`})
-    }
-    next();
+  const resStatus = res.locals.foundReservation.status;
+  const updateStatus = req.body.data.status;
+
+  if (resStatus === 'finished') {
+    next({
+      status: 400,
+      message: `${res.locals.foundReservation.reservation_id} has status: ${resStatus}`,
+    });
+  }
+  if (updateStatus === "unknown") {
+    next({ status: 400, message: `Cannot enter a status of ${updateStatus}` });
+  }
+  next();
 }
 
-async function updateStatus(req, res, next) {
-
+async function updateStatus(req, res, _next) {
   const updatedRes = {
     ...res.locals.foundReservation,
     status: req.body.data.status,
-  }
+  };
+
   const updated = await service.update(updatedRes);
-  res.status(200).json({ data: updated })
+
+  res.status(200).json({ data: updated });
 }
 
+function validateReservationForUpdate(req, _res, next) {
+  const {
+    first_name,
+    last_name,
+    people,
+    reservation_date,
+    reservation_time,
+    mobile_number,
+  } = req.body.data;
+  let errorField = "";
 
-function validateReservationForUpdate(req, res, next) {
-  const {first_name, last_name, people, reservation_date, reservation_time, mobile_number } = req.body.data;
-  let errorField;
-
-  if(!first_name || first_name.length < 1){
-    errorField = 'first_name'
-  }
-  if(!last_name || last_name.length < 1) {
-    errorField = 'last_name'
-  }
-  if(!mobile_number || mobile_number.length < 1){
-    errorField = 'mobile_number'
-  }
-  if(!reservation_time){
-    errorField = 'reservation_time'
-  }
-  if(!reservation_date) {
-    errorField = 'reservation_date'
-  }
-  if(people === 0) {
-    errorField = 'people'
-  }
-
-  if(errorField){
-    next({status:400, message:`${errorField} is invalid.`})
+  switch (true) {
+    case !first_name || first_name.length < 1:
+      errorField = 'first_name';
+      break;
+    case !last_name || last_name.length < 1:
+      errorField = 'last_name';
+      break;
+    case !mobile_number || mobile_number.length < 1:
+      errorField = 'mobile_number';
+      break;
+    case !reservation_time:
+      errorField = 'reservation_time';
+      break;
+    case !reservation_date:
+      errorField = 'reservation_date';
+      break;
+    case people === 0:
+      errorField = 'people';
+      break;
+    default:
+      break;
   }
 
+  if (errorField) {
+    next({ status: 400, message: `${errorField} is invalid.` });
+  }
 
   next();
 }
 
-async function update(req, res, next) {
+async function update(req, res, _next) {
   const { foundReservation } = res.locals;
-  const updatedReservation = req.body.data;
- 
 
   const updatedRes = {
-    ...updatedReservation,
-    reservation_id: foundReservation.reservation_id
-  }
+    ...req.body.data,
+    reservation_id: foundReservation.reservation_id,
+  };
+
   const updated = await service.update(updatedRes);
-  res.status(200).json({ data: updated })
+
+  res.status(200).json({ data: updated });
 }
-
-
 
 module.exports = {
   list: [asyncErrorBoundary(searchPhoneNum), asyncErrorBoundary(list)],
-  create: [hasRequiredProperties, validateInputTypes, asyncErrorBoundary(create)],
+  create: [
+    hasRequiredProperties,
+    validateInputTypes,
+    asyncErrorBoundary(create),
+  ],
   read: [asyncErrorBoundary(reservationExists), asyncErrorBoundary(read)],
-  updateStatus: [asyncErrorBoundary(reservationExists), validateStatusChange, asyncErrorBoundary(updateStatus)],
-  update: [asyncErrorBoundary(reservationExists), validateReservationForUpdate, validateInputTypes, asyncErrorBoundary(update)]
+  updateStatus: [
+    asyncErrorBoundary(reservationExists),
+    validateStatusChange,
+    asyncErrorBoundary(updateStatus),
+  ],
+  update: [
+    asyncErrorBoundary(reservationExists),
+    validateReservationForUpdate,
+    validateInputTypes,
+    asyncErrorBoundary(update),
+  ],
 };

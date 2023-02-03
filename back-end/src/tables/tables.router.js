@@ -17,9 +17,4 @@ router.route("/:table_id/seat")
     .delete(controller.delete)
     .all(methodNotAllowed);
 
-// router.route("/new")
-//     .all(methodNotAllowed);
-
-
-
 module.exports = router;
