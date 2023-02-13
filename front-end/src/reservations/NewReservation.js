@@ -68,16 +68,19 @@ export default function NewReservation() {
         setPeopleError("");
         
         const {first_name, last_name, mobile_number, reservation_date, reservation_time, people} = formData;
-        
+      
         const fullReservationDate = new Date(`${reservation_date}T${reservation_time}:00`)
+        // const fullReservationDate = new Date(`${reservation_date}T${reservation_time}`)
+
+
         const fullTodayDate = new Date();
 
 
-        const reservationTimeHours = reservation_time.slice(0,2);
-        const reservationTimeMinutes = reservation_time.slice(3,5);
-
-        console.log(fullReservationDate.getUTCDay())
-
+        const reservationTimeHours = Number(reservation_time.slice(0,2));
+        const reservationTimeMinutes = Number(reservation_time.slice(3,5));
+        console.log(reservationTimeHours, reservationTimeMinutes, typeof(reservationTimeHours))
+        
+        
         if(first_name.length < 1){
             setFirstNameError("A first name is required.");
         }
@@ -93,16 +96,36 @@ export default function NewReservation() {
         if(fullTodayDate > fullReservationDate){
             setDateError("Reservations must be in the future.");
         }
-        if(!reservationTimeHours || !reservationTimeMinutes){
+        if(reservationTimeHours == 10 && reservationTimeMinutes <= 30){
+            setTimeError("Reservations must be after 10:30")
+        }
+        if(reservationTimeHours < 10){
+            setTimeError("Reservations must be after 10:30")
+        }
+
+        if(reservationTimeHours >= 21 && reservationTimeMinutes >= 30){
+            if (reservationTimeHours <= 22 && reservationTimeMinutes <= 30){
+                setTimeError("We are closing soon, no reservations for this time.")
+            }
+        }
+
+        if(reservationTimeMinutes > 30){
+            if(reservationTimeHours >= 22) {
+                setTimeError("Too late.")
+            }
+        }
+
+        // if(reservationTimeHours == 21 && reservationTimeMinutes >= 30){
+        //     setTimeError("Reservations must be before 21:30")
+        // }
+        
+        // if(reservationTimeHours > 21){
+        //     setTimeError("Reservations must be before 21:30")
+        // }
+        if(typeof(fullReservationDate.getHours()) !== 'number' || typeof(fullReservationDate.getMinutes()) !== 'number'){
             setTimeError("Please enter a valid reservation time");
         }
-        if(reservationTimeMinutes && reservationTimeMinutes <= 30 && reservationTimeHours <= 10){
-            setTimeError("Reservations must be after 10:30");
-        }
-        if(reservationTimeMinutes >= 30 && reservationTimeHours >= 21){
-            setTimeError("Reservations must be before 21:30");
-        }
-        if(fullReservationDate.getUTCDay() === 3){
+        if(fullReservationDate.getDay() === 2){
             setDayError("Sorry, we are closed on Tuesdays.");
         }
     }
@@ -111,6 +134,9 @@ export default function NewReservation() {
         event.preventDefault();
         formData.people = Number(formData.people);
         const reservation = formData;
+        console.log(`TTTTTTTTTTTTTT`, formData.reservation_time)
+ 
+
         setError(null);
         checkData(reservation);
         async function callCreateReservation() {
@@ -191,8 +217,8 @@ export default function NewReservation() {
                                 type="time"
                                 onChange={handleChange}
                                 value={formData.reservation_time}
-                                placeholder="HH:MM"
-                                pattern="[0-9]{2}:[0-9]{2}"
+                                // placeholder="HH:MM"
+                                // pattern="[0-9]{2}:[0-9]{2}"
                                 />
                         </td>
 
