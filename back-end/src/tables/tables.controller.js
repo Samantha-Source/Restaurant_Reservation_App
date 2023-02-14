@@ -46,7 +46,6 @@ async function update(_req, res, next) {
     const updatedTable = {
         reservation_id: thisReservation.reservation_id,
         table_id: foundTable.table_id,
-        status: 'occupied',
     };
 
     const updated = await service.update(updatedTable);
@@ -54,6 +53,9 @@ async function update(_req, res, next) {
     if(thisReservation.status == 'seated') {
         next({ status: 400, message: `Reservation is ${thisReservation.status}.`});
     };
+    if(foundTable.reservation_id) {
+        next({ status: 400, message: `Table is occupied`})
+    }
 
     await updateReservation({
         ...thisReservation,
@@ -66,17 +68,19 @@ async function update(_req, res, next) {
 async function destroy(req, res, next) {
     const { foundTable } = res.locals;
 
-    foundTable.status === 'free' ? next({ status: 400, message: 'Table is not occupied.'}) : await service.delete(foundTable.table_id);
+    foundTable.reservation_id === null ? next({ status: 400, message: 'Table is not occupied.'}) : await service.delete(foundTable.table_id);
 
     const foundReservation = await readReservation(foundTable.reservation_id);
+ 
 
-    await updateReservation({
+    const updatedRes = await updateReservation({
         ...foundReservation,
         status: 'finished',
     });
-    
-    await service.list();
-    res.sendStatus(200);
+    //TODO delete unused code
+    const listing = await service.list();
+
+    res.status(200).json({data: updatedRes});
 }
 
 
