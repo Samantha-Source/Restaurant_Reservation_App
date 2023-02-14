@@ -134,9 +134,7 @@ export default function NewReservation() {
         event.preventDefault();
         formData.people = Number(formData.people);
         const reservation = formData;
-        console.log(`TTTTTTTTTTTTTT`, formData.reservation_time)
  
-
         setError(null);
         checkData(reservation);
         async function callCreateReservation() {
@@ -161,6 +159,8 @@ export default function NewReservation() {
     }
 
     return (
+        <>
+        <h3>Create a new Reservation</h3>
         <form name="create" onSubmit={handleSubmit}>
             <table>
                 <tbody>
@@ -242,6 +242,7 @@ export default function NewReservation() {
             </table>
             <div>{errorDiv}</div>
         </form>
+        </>
     )
 
 }
