@@ -3,7 +3,10 @@ import { listReservations, listTables, finishTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { Link, useHistory } from "react-router-dom";
 import { previous, next } from "../utils/date-time";
-import ListReservations from "../reservations/ListReservations";
+import { useParams } from "react-router-dom";
+import useQuery from "../utils/useQuery";
+import { today } from "../utils/date-time";
+
 
 /**
  * Defines the dashboard page.
@@ -11,18 +14,18 @@ import ListReservations from "../reservations/ListReservations";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
+function ListReservations() {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
-  const [tables, setTables] = useState([]);
-  const [tablesError, setTablesError] = useState(null);
+let date = useQuery().get('date') || today();
+
   
   let history = useHistory();
   
 
-  useEffect(loadDashboard, [date]);
+  useEffect(loadReservations, [date]);
 
-  function loadDashboard() {
+  function loadReservations() {
     const abortController = new AbortController();
     setReservationsError(null);
     listReservations({ date }, abortController.signal)
@@ -31,26 +34,7 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
-  useEffect(loadTables, [])
 
-  function loadTables() {
-    const abortController = new AbortController();
-    listTables(abortController.signal)
-      .then(setTables)
-      .catch(setTablesError);
-    return () => abortController.abort();
-  }
-  
-
-  function clickPrevious() {
-    let previousDay = previous(date)
-    history.push(`/dashboard?date=${previousDay}`);
-  }
-
-  function clickNext() {
-    let nextDay = next(date)
-    history.push(`/dashboard?date=${nextDay}`)
-  }
 
   function finishable(table){
     if(table.reservation_id){
@@ -70,8 +54,8 @@ function Dashboard({ date }) {
     if(window.confirm('Is this table ready to seat new guests? \n \nThis cannot be undone.')) {
       try{
         await finishTable(event.target.value);
-        loadTables();
-        loadDashboard();
+        // loadTables();
+        loadReservations();
       }
       catch(error){
         console.log(error);
@@ -79,25 +63,10 @@ function Dashboard({ date }) {
     }
   }
 
-
-  const mappedTables = tables.map((table, index) => (
-      <>
-      <tr key={index}>
-        <td>{table.table_name}</td>
-        <td>{table.capacity}</td>
-        <td data-table-id-status={table.table_id}>{table.reservation_id ? 'occupied' : 'free'}</td>
-        <td>{finishable(table)}</td>
-        </tr>
-      </>
-    ))
-  
-
     const handleCancel = (event) => {
       //LEFT OFF HERE NEED TO IMPLEMENT CANCEL
       console.log(event.target.value)
     }
-
-    const reservationsList = ListReservations()
 
   return (
     <main>
@@ -162,36 +131,9 @@ function Dashboard({ date }) {
       ) : (
         <p>No reservations found for this date.</p>
       )}
-      <button type="button" onClick={clickPrevious}>Previous</button>
 
-      <Link to="/dashboard">
-      <button type="button" Link to="/dashboard">Today</button>
-      </Link>
-
-      <button type="button" onClick={clickNext}>Next</button>
-      <p>{date}</p>
-      {/* {JSON.stringify(reservations)} */}
-
-      <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Tables</h4>
-      </div>
-      <ErrorAlert error={tablesError} />
-      <table className = "table">
-        <thead>
-          <tr>
-            <th>Table Name</th>
-            <th>Capacity</th>
-            <th>Status</th>
-            <th>Finish</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mappedTables}
-        </tbody>
-      </table>
-      <div>{reservationsList}</div>
     </main>
   );
 }
 
-export default Dashboard;
+export default ListReservations;
