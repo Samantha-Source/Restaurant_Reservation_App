@@ -72,6 +72,7 @@ function Dashboard({ date }) {
         await finishTable(event.target.value);
         loadTables();
         loadDashboard();
+        listReservations({date});
       }
       catch(error){
         console.log(error);
@@ -97,7 +98,7 @@ function Dashboard({ date }) {
       console.log(event.target.value)
     }
 
-    const reservationsList = ListReservations()
+    const reservationsList = ListReservations({date})
 
   return (
     <main>
@@ -105,6 +106,7 @@ function Dashboard({ date }) {
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for date {date}</h4>
       </div>
+
       <ErrorAlert error={reservationsError} />
       {reservations.length > 0 ? (
         <table className = "table">
@@ -162,6 +164,11 @@ function Dashboard({ date }) {
       ) : (
         <p>No reservations found for this date.</p>
       )}
+
+        
+           {/* {reservationsList} */}
+
+
       <button type="button" onClick={clickPrevious}>Previous</button>
 
       <Link to="/dashboard">
@@ -189,7 +196,7 @@ function Dashboard({ date }) {
           {mappedTables}
         </tbody>
       </table>
-      <div>{reservationsList}</div>
+
     </main>
   );
 }

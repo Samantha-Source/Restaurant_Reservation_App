@@ -14,16 +14,28 @@ import { today } from "../utils/date-time";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function ListReservations() {
+function ListReservations({date}) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
-let date = useQuery().get('date') || today();
+// let date = useQuery().get('date') || today();
 
   
   let history = useHistory();
   
+  const [tables, setTables] = useState([]);
+  const [tablesError, setTablesError] = useState(null);
+  useEffect(loadTables, [])
 
-  useEffect(loadReservations, [date]);
+  function loadTables() {
+    const abortController = new AbortController();
+    listTables(abortController.signal)
+      .then(setTables)
+      .catch(setTablesError);
+    return () => abortController.abort();
+  }
+
+
+  useEffect(loadReservations, [date, tables]);
 
   function loadReservations() {
     const abortController = new AbortController();
@@ -54,7 +66,7 @@ let date = useQuery().get('date') || today();
     if(window.confirm('Is this table ready to seat new guests? \n \nThis cannot be undone.')) {
       try{
         await finishTable(event.target.value);
-        // loadTables();
+        loadTables();
         loadReservations();
       }
       catch(error){
@@ -70,10 +82,10 @@ let date = useQuery().get('date') || today();
 
   return (
     <main>
-      <h1>Dashboard</h1>
+      {/* <h1>Dashboard</h1>
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for date {date}</h4>
-      </div>
+      </div> */}
       <ErrorAlert error={reservationsError} />
       {reservations.length > 0 ? (
         <table className = "table">
