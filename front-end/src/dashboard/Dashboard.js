@@ -3,7 +3,8 @@ import { listReservations, listTables, finishTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { Link, useHistory } from "react-router-dom";
 import { previous, next } from "../utils/date-time";
-
+import { cancelReservation } from "../utils/api";
+import ReservationsList from "../reservations/ReservationsList";
 
 /**
  * Defines the dashboard page.
@@ -66,7 +67,7 @@ function Dashboard({ date }) {
   }
 
   const handleFinish = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     if(window.confirm('Is this table ready to seat new guests? \n \nThis cannot be undone.')) {
       try{
         await finishTable(event.target.value);
@@ -75,6 +76,7 @@ function Dashboard({ date }) {
       }
       catch(error){
         console.log(error);
+        throw error;
       }
     }
   }
@@ -92,13 +94,35 @@ function Dashboard({ date }) {
     ))
   
 
+    const handleCancel = async (event) => {
+      event.preventDefault();
+      if(window.confirm(`Do you want to cancel this reservation? \n \nThis cannot be undone.`)) {
+        try{
+          await cancelReservation(event.target.value);
+          loadTables();
+          loadDashboard();
+        }
+        catch(error) {
+          console.log(error)
+          throw error
+        }
+      }
+
+    }
+
   return (
     <main>
       <h1>Dashboard</h1>
       <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations for date</h4>
+        <h4 className="mb-0">Reservations for date {date}</h4>
       </div>
-      <ErrorAlert error={reservationsError} />
+
+      <ReservationsList
+        reservations={reservations}
+        reservationsError={reservationsError}
+        handleCancel={handleCancel}
+        />
+      {/* <ErrorAlert error={reservationsError} />
       {reservations.length > 0 ? (
         <table className = "table">
           <thead>
@@ -111,6 +135,9 @@ function Dashboard({ date }) {
               <th>Reservation Time</th>
               <th>People</th>
               <th>Status</th>
+              <th>Seat</th>
+              <th>Edit</th>
+              <th>Cancel</th>
             </tr>
           </thead>
           <tbody>
@@ -124,17 +151,34 @@ function Dashboard({ date }) {
                 <td>{reservation.reservation_time}</td>
                 <td>{reservation.people}</td>
                 <td data-reservation-id-status={reservation.reservation_id}>{reservation.status}</td>
-                {reservation.status === 'seated' ? '' : 
+                <td>{reservation.status === 'seated' ? '' : 
                 <Link to={`/reservations/${reservation.reservation_id}/seat`}>
-                  <button type="button" Link to="/reservations/{reservation.reservation_id}/seat">Seat</button>
+                  <button type="button">Seat</button>
                 </Link>}
+                </td>
+
+                <td>{reservation.status === 'booked' ?
+                  <Link to={`/reservations/${reservation.reservation_id}/edit`}>
+                  <button type="button">Edit</button>
+                  </Link> : ''}
+                </td>
+
+                <td>
+                  <button 
+                    type="button" 
+                    value={reservation.reservation_id}
+                    data-reservation-id-cancel={reservation.reservation_id}
+                    onClick={handleCancel}
+                    >Cancel</button>
+                </td>
+
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
         <p>No reservations found for this date.</p>
-      )}
+      )} */}
       <button type="button" onClick={clickPrevious}>Previous</button>
 
       <Link to="/dashboard">

@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { createReservation, readReservation, editReservation } from "../utils/api";
-import { useLocation, useHistory, useParams } from "react-router-dom";
+import { createReservation } from "../utils/api";
+import { useLocation, useHistory } from "react-router-dom";
+import ReservationForm from "./ReservationForm";
 
 
 //TODO take out extra code (reservationInfo ?) & unused imports (useEffect)
 //TODO find better way for error validation
-export default function NewReservation({ edit }) {
+export default function NewReservation() {
     const history = useHistory();
     let location = useLocation();
     let query = new URLSearchParams(location.search);
-
+   
     const initialFormState = {
         first_name: "",
         last_name: "",
@@ -19,7 +20,9 @@ export default function NewReservation({ edit }) {
         people: "",
     }
 
+
     const [formData, setFormData] = useState(initialFormState);
+  
 
     const handleChange = ({ target }) => {
         setFormData({...formData, [target.name]:target.value});
@@ -70,7 +73,6 @@ export default function NewReservation({ edit }) {
         const {first_name, last_name, mobile_number, reservation_date, reservation_time, people} = formData;
       
         const fullReservationDate = new Date(`${reservation_date}T${reservation_time}:00`)
-        // const fullReservationDate = new Date(`${reservation_date}T${reservation_time}`)
 
 
         const fullTodayDate = new Date();
@@ -78,7 +80,7 @@ export default function NewReservation({ edit }) {
 
         const reservationTimeHours = Number(reservation_time.slice(0,2));
         const reservationTimeMinutes = Number(reservation_time.slice(3,5));
-        console.log(reservationTimeHours, reservationTimeMinutes, typeof(reservationTimeHours))
+
         
         
         if(first_name.length < 1){
@@ -115,13 +117,6 @@ export default function NewReservation({ edit }) {
             }
         }
 
-        // if(reservationTimeHours == 21 && reservationTimeMinutes >= 30){
-        //     setTimeError("Reservations must be before 21:30")
-        // }
-        
-        // if(reservationTimeHours > 21){
-        //     setTimeError("Reservations must be before 21:30")
-        // }
         if(typeof(fullReservationDate.getHours()) !== 'number' || typeof(fullReservationDate.getMinutes()) !== 'number'){
             setTimeError("Please enter a valid reservation time");
         }
@@ -157,6 +152,7 @@ export default function NewReservation({ edit }) {
 
         setError(null);
         checkData(reservation);
+        // ValidateReservation(formData)
         async function callCreateReservation() {
             try{
                 await createReservation(reservation);
@@ -201,87 +197,97 @@ export default function NewReservation({ edit }) {
     return (
         <>
         <h3>Create a new Reservation</h3>
-        <form name="create" onSubmit={handleSubmit}>
-            <table>
-                <tbody>
-                    <tr>
-                        <td>
-                            <input
-                                id="first_name"
-                                name="first_name"
-                                type="text"
-                                onChange={handleChange}
-                                value={formData.first_name}
-                                placeholder="First Name"
-                                />
-                        </td>
+        <ReservationForm
+            handleSubmit={handleSubmit}
+            handleChange={handleChange}
+            formData={formData}
+            goBack={goBack} />
 
-                        <td>
-                            <input
-                                id="last_name"
-                                name="last_name"
-                                type="text"
-                                onChange={handleChange}
-                                value={formData.last_name}
-                                placeholder="Last Name"
-                                />
-                        </td>
 
-                        <td>
-                            <input
-                                id="mobile_number"
-                                name="mobile_number"
-                                type="text"
-                                onChange={handleChange}
-                                value={formData.mobile_number}
-                                placeholder="Mobile Number"
-                                />
-                        </td>
+    
 
-                        <td>
-                            <input
-                                id="reservaion_date"
-                                name="reservation_date"
-                                type="date"
-                                onChange={handleChange}
-                                value={formData.reservation_date}
-                                placeholder="YYYY-MM-DD"
-                                pattern="\d{4}-\d{2}-\d{2}"
-                                />
-                        </td>
+        {/* // <form name="create" onSubmit={handleSubmit}>
+        //     <table>
+        //         <tbody>
+        //             <tr>
+        //                 <td>
+        //                     <input
+        //                         id="first_name"
+        //                         name="first_name"
+        //                         type="text"
+        //                         onChange={handleChange}
+        //                         value={formData.first_name}
+        //                         placeholder="First Name"
+        //                         />
+        //                 </td>
 
-                        <td>
-                            <input
-                                id="reservation_time"
-                                name="reservation_time"
-                                type="time"
-                                onChange={handleChange}
-                                value={formData.reservation_time}
-                                // placeholder="HH:MM"
-                                // pattern="[0-9]{2}:[0-9]{2}"
-                                />
-                        </td>
+        //                 <td>
+        //                     <input
+        //                         id="last_name"
+        //                         name="last_name"
+        //                         type="text"
+        //                         onChange={handleChange}
+        //                         value={formData.last_name}
+        //                         placeholder="Last Name"
+        //                         />
+        //                 </td>
 
-                        <td>
-                            <input
-                                id="people"
-                                name="people"
-                                type="number"
-                                min="1"
-                                onChange={handleChange}
-                                value={formData.people}
-                                placeholder="Number of people"
-                                />
-                        </td>
-                        <td>
-                            <button type="submit" onClick={handleSubmit}>Submit</button>
-                            <button type="cancel" onClick={goBack}>Cancel</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div>{errorDiv}</div>
-        </form>
+        //                 <td>
+        //                     <input
+        //                         id="mobile_number"
+        //                         name="mobile_number"
+        //                         type="text"
+        //                         onChange={handleChange}
+        //                         value={formData.mobile_number}
+        //                         placeholder="Mobile Number"
+        //                         />
+        //                 </td>
+
+        //                 <td>
+        //                     <input
+        //                         id="reservaion_date"
+        //                         name="reservation_date"
+        //                         type="date"
+        //                         onChange={handleChange}
+        //                         value={formData.reservation_date}
+        //                         placeholder="YYYY-MM-DD"
+        //                         pattern="\d{4}-\d{2}-\d{2}"
+        //                         />
+        //                 </td>
+
+        //                 <td>
+        //                     <input
+        //                         id="reservation_time"
+        //                         name="reservation_time"
+        //                         type="time"
+        //                         onChange={handleChange}
+        //                         value={formData.reservation_time}
+        //                         // placeholder="HH:MM"
+        //                         // pattern="[0-9]{2}:[0-9]{2}"
+        //                         />
+        //                 </td>
+
+        //                 <td>
+        //                     <input
+        //                         id="people"
+        //                         name="people"
+        //                         type="number"
+        //                         min="1"
+        //                         onChange={handleChange}
+        //                         value={formData.people}
+        //                         placeholder="Number of people"
+        //                         />
+        //                 </td>
+        //                 <td>
+        //                     <button type="submit" onClick={handleSubmit}>Submit</button>
+        //                     <button type="cancel" onClick={goBack}>Cancel</button>
+        //                 </td>
+        //             </tr>
+        //         </tbody>
+        //     </table>
+        //     <div>{errorDiv}</div>
+        // </form> */}
+        <div>{errorDiv}</div>
         </>
     )
 

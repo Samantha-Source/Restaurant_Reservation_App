@@ -3,10 +3,13 @@ import { listReservations } from "../utils/api";
 import { Link } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useEffect } from "react";
+import ReservationsList from "../reservations/ReservationsList";
+import { cancelReservation } from "../utils/api";
+import { useParams } from "react-router-dom";
 
 export default function Search(){
     const [phoneNumber, setPhoneNumber] = useState("");
-
+    const {date} = useParams();
     const handleChange = ({ target }) => {
         setPhoneNumber(target.value)
     }
@@ -38,15 +41,32 @@ export default function Search(){
     //   return () => abortController.abort();
     // }
 
-    // const mappedReservations = reservations? reservations.map((reservation, index) => (
-    //     <>
-    //     <tr key={index}>
-    //         <td>{reservation.first_name}</td>
 
-    //     </tr>
-    //     </>
 
-    // )) : null;
+    function loadDashboard() {
+      const abortController = new AbortController();
+      setReservationsError(null);
+      listReservations({ date }, abortController.signal)
+        .then(setReservations)
+        .catch(setReservationsError);
+      return () => abortController.abort();
+    }
+
+    const handleCancel = async (event) => {
+      event.preventDefault();
+      if(window.confirm(`Do you want to cancel this reservation? \n \nThis cannot be undone.`)) {
+        try{
+          await cancelReservation(event.target.value);
+          // loadTables();
+          loadDashboard();
+        }
+        catch(error) {
+          console.log(error)
+          throw error
+        }
+      }
+
+    }
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -59,6 +79,7 @@ export default function Search(){
         
         return () => abortController.abort();
     }
+
 
 
     return (
@@ -79,23 +100,18 @@ export default function Search(){
         </form>
 
         <div>
-            {/* {mappedReservations ? (
-                <table>
-                    {mappedReservations}
-                </table>
-            ) : (
-                <p>No reservations found</p>
-            )} */}
-
-
-
-
-
+  
 
         {/* <ErrorAlert error={reservationsError} /> */}
 
 {/* This works!!!!! */}
-      {reservations.length > 0 ? (
+            <ReservationsList
+            reservations={reservations}
+            reservationsError={reservationsError}
+            handleCancel={handleCancel}
+            date={date}
+            />
+      {/* {reservations.length > 0 ? (
         <table className = "table">
           <thead>
             <tr>
@@ -107,6 +123,7 @@ export default function Search(){
               <th>Reservation Time</th>
               <th>People</th>
               <th>Status</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
@@ -119,20 +136,24 @@ export default function Search(){
                 <td>{reservation.reservation_date}</td>
                 <td>{reservation.reservation_time}</td>
                 <td>{reservation.people}</td>
-                <td
-                //  data-reservation-id-status={reservation.reservation_id}
-                 >{reservation.status}</td>
-                {reservation.status === 'seated' ? '' : 
+                <td>{reservation.status === 'seated' ? '' : 
                 <Link to={`/reservations/${reservation.reservation_id}/seat`}>
-                  <button type="button" Link to="/reservations/{reservation.reservation_id}/seat">Seat</button>
+                  <button type="button">Seat</button>
                 </Link>}
-              </tr>
+                </td>
+
+                <td>
+                  <Link to={`/reservations/${reservation.reservation_id}/edit`}>
+                  <button type="button">Edit</button>
+                  </Link>
+                </td>
+            </tr>
             ))}
           </tbody>
         </table>
       ) : (
         <p>No reservations found.</p>
-      )}
+      )} */}
       </div>  
     </main>
     )
