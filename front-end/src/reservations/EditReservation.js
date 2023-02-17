@@ -5,12 +5,13 @@ import { useEffect } from "react";
 import ReservationForm from "./ReservationForm";
 import { useHistory } from "react-router";
 import { editReservation } from "../utils/api";
+import ValidateReservation from "./ValidateReservation";
 
 
 export default function EditReservation(){
     const { reservation_id } = useParams();
     const [currentReservationError, setCurrentReservationError] = useState(null);
-    
+    const [errorDiv, setErrorDiv] = useState();
     const history = useHistory();
 
     const initialFormState = {
@@ -23,8 +24,6 @@ export default function EditReservation(){
     }
     const [formData, setFormData] = useState(initialFormState);
 
-//TODO delete excess code
-    // function loadReservation() {
     //     const abortController = new AbortController();
     //     readReservation(reservation_id, abortController.signal)
     //         .then(setFormData)
@@ -47,18 +46,16 @@ export default function EditReservation(){
     }, [reservation_id])
 
 
-
-
 const goBack = (event) => {
     event.preventDefault();
     history.goBack();
 }
 
+const [updateError, setUpdateError] = useState();
+
 const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(`submittttttteeeedddd`)
 
-    // updateTheReservation()
     const updatedReservation = {
         first_name: formData.first_name,
         last_name: formData.last_name,
@@ -67,55 +64,23 @@ const handleSubmit = async (event) => {
         reservation_time: formData.reservation_time,
         people: Number(formData.people),
     }
-    console.log(formData.reservation_time)
-        const abortController = new AbortController();
-        try{
-            await editReservation(reservation_id, updatedReservation, abortController.signal);
-            // readReservation(reservation_id)
-            // setFormData(formData)
-            history.push(`/dashboard?date=${updatedReservation.reservation_date}`)
-        }
-        catch(error) {
-            console.log(error);
-            setCurrentReservationError(error.message);
-            // throw error
+
+    setErrorDiv(ValidateReservation(updatedReservation));
+    
+    if(ValidateReservation(updatedReservation).props.className !== "error alert alert-danger"){
+    const abortController = new AbortController();
+    try{
+        await editReservation(reservation_id, updatedReservation, abortController.signal);
+        history.push(`/dashboard?date=${updatedReservation.reservation_date}`)
+    }
+    catch(error) {
+        console.log(error);
+        setUpdateError(error.message);
         
     }
     return () => abortController.abort;
-
-
-
-
-    // const abortController = new AbortController();
-    // editReservation(reservation_id, updatedReservation, abortController.signal)
-    //     .then(setFormData(formData))
-    //     // .then(() =>
-    //     // history.push(`/dashboard?date=${formData.reservation_date}`)
-    //     // )
-    //     .then(readReservation(reservation_id))
-    //     .then(() => history.goBack())
-    //     .catch((error) => setCurrentReservationError(error))
-} 
-const [updateError, setUpdateErorr] = useState();
-
-async function updateTheReservation() {
-    const updatedReservation = {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        mobile_number: formData.mobile_number,
-        reservation_date: formData.reservation_date,
-        reservation_time: formData.reservation_time,
-        people: Number(formData.people),
-    }
-    console.log(`heeeeeeeeerrrrrreeeeee`)
-    editReservation(reservation_id, updatedReservation)
-    .then(() => history.push('/dashboard'))
-    .catch(setUpdateErorr)
-}
-
-
-
-
+    } 
+}   
 
 
 
@@ -132,6 +97,7 @@ const handleChange = ({ target }) => {
             formData={formData}
             goBack={goBack}
             />
+            <div>{!errorDiv ? '' : errorDiv}</div>
         </>
     )
 }

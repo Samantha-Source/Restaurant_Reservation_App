@@ -4,14 +4,9 @@ function validType() {
         // regex to match required date format
         const reDate = /^(\d{4})-(\d{1,2})-(\d{1,2})/;
         // regex to match required time format
-        const reTime = /^\d{1,2}:\d{2}([ap]m)?$/;
-        // regex to match 24hour clock format
-        const re24Time = /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
-        
-        //TODO get rid of extra regex above this line (not incl. reDate)
-        // other regex time from instructions
-        const otherRegex = /^[0-9]{2}:[0-9]{2}/
-
+        const reTime = /^[0-9]{2}:[0-9]{2}/
+        // regex to match phone number format
+        const rePhone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/
 
 
         const reservationDate = new Date(data.reservation_date);
@@ -32,9 +27,11 @@ function validType() {
             case !data.reservation_date.match(reDate):
                 errorMessage = 'reservation_date is an invalid format.  Please use YYYY:MM:DD format.';
                 break;
-            case !data.reservation_time.match(otherRegex):
-                errorMessage = `reservation_time is an invalid format. ${data.reservation_time} ${reservationDate}`;
+            case !data.reservation_time.match(reTime):
+                errorMessage = `reservation_time is an invalid format.`;
                 break;
+            case !data.mobile_number.match(rePhone):
+                errorMessage = 'phone number is invalid.';
             case reservationDate.getUTCDay() === 2:
                 errorMessage = 'Sorry, we are closed on Tuesdays.';
                 break;
@@ -52,14 +49,7 @@ function validType() {
                 break;
             case reservationTimeHours == 10 && reservationTimeMinutes <= 30:
                 errorMessage = `Invalid time.`
-                break;
-                //TODO get rix of extra code
-            // case reservationTimeMinutes <= 30 && reservationTimeHours <= 10:
-            //     errorMessage = 'Invalid time.';
-            //     break;
-            // case reservationTimeMinutes >= 30 && reservationTimeHours >= 21:
-            //     errorMessage = 'Invalid time.';
-            //     break;      
+                break;    
             default:
                 break;            
         }
