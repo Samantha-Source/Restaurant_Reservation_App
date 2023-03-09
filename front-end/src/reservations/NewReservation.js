@@ -62,13 +62,14 @@ export default function NewReservation() {
 
     return (
         <>
-        <h3>Create a new Reservation</h3>
+        <h4>Create a New Reservation</h4>
+        <hr></hr>
         <ReservationForm
             handleSubmit={handleSubmit}
             handleChange={handleChange}
             formData={formData}
             goBack={goBack} />
-        <div>{!errorDiv ? '' : errorDiv}</div>
+        <div className="error-div">{!errorDiv ? '' : errorDiv}</div>
         </>
     )
 }

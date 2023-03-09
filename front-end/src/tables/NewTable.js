@@ -54,15 +54,17 @@ export default function NewTable() {
     }
 
     const errorDiv = displayError ? 
-    <div className = "error alert alert-danger">
+    <div className="error alert alert-danger error-div">
       <p>{displayError}</p>
     </div> : '';
 
     return (
         <>
-        <h3>Create a new Table</h3>
+        <h4>Create a New Table</h4>
+        <hr></hr>
         <form name="createTable" onSubmit={handleSubmit}>
             <table>
+                <tbody>
                 <tr>
                     <td>
                         <input
@@ -72,9 +74,12 @@ export default function NewTable() {
                             onChange={handleChange}
                             value={formData.table_name}
                             placeholder="Table Name"
+                            className="input-field form-control"
                             />
                     </td>
+                    </tr>
 
+                    <tr>
                     <td>
                         <input
                             id="capacity"
@@ -84,16 +89,29 @@ export default function NewTable() {
                             onChange={handleChange}
                             value={formData.capacity}
                             placeHolder="Capacity"
+                            class="input-field form-control"
                             />
                     </td>
+                    </tr>
 
+                    <tr>
                     <td>
-                        <button type="submit" 
+                        <button 
+                        type="submit" 
                         onClick={handleSubmit}
-                        >Submit</button>
-                        <button type="cancel" onClick={goBack}>Cancel</button>
+                        class="btn btn-success"
+                        >Submit
+                        </button>
+                        <button 
+                        type="cancel" 
+                        onClick={goBack} 
+                        class="btn btn-danger"
+                        style={{margin: 5}}
+                        >Cancel
+                        </button>
                     </td>
                 </tr>
+                </tbody>
             </table>
         </form>
         {errorDiv}
