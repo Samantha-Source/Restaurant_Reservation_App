@@ -5,6 +5,7 @@ import { Link, useHistory } from "react-router-dom";
 import { previous, next } from "../utils/date-time";
 import { cancelReservation } from "../utils/api";
 import ReservationsList from "../reservations/ReservationsList";
+import ReactModal from "react-modal";
 
 /**
  * Defines the dashboard page.
@@ -17,12 +18,16 @@ function Dashboard({ date }) {
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
-  
-  
+  const [showPopup, setShowPopup] = useState(localStorage.getItem("popupShown") !== "true");
+  // const [showPopup, setShowPopup] = useState(true);
+
   let history = useHistory();
   
 
   useEffect(loadDashboard, [date]);
+  useEffect(() => {
+    localStorage.setItem("popupShown", "true")
+  }, [])
 
   function loadDashboard() {
     const abortController = new AbortController();
@@ -30,6 +35,8 @@ function Dashboard({ date }) {
     listReservations({ date }, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
+
+
     return () => abortController.abort();
   }
 
@@ -113,6 +120,40 @@ function Dashboard({ date }) {
 
   return (
     <main>
+      <ReactModal isOpen={showPopup} style = {{
+        overlay: {
+          position: 'fixed',
+          top: '25%',
+          left: '30%',
+          right: '30%',
+          bottom: '50%',
+          backgroundColor: 'rgba(244, 196, 137, 0.8)',
+          borderRadius: '10px'
+        },
+        content: {
+          position: 'absolute',
+          top: '40px',
+          left: '40px',
+          right: '40px',
+          bottom: '40px',
+          border: '1px solid #ccc',
+          background: '#fff',
+          borderRadius: '16px',
+          outline: '1px',
+          padding: '20px',
+          alignItems: "center",
+          justifyContent: "center"
+        }
+      }
+
+      }>
+          <h2>Welcome to The Periodic Tables Restaurant Reservation App!</h2>
+          <p style={{textAlign: "center", fontSize: "larger"}}>Please be patient with the tables loading</p>
+          <p style={{textAlign: "center"}}>We are using a free DataBase and response times are often slow.</p>
+          <button style={{marginLeft: "47%" }} onClick={() => setShowPopup(false)}>Close</button>      
+        </ReactModal>
+
+
       <h1>Dashboard</h1>
       <hr></hr>
       <br></br>
