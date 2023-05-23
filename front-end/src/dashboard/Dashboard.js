@@ -5,7 +5,7 @@ import { Link, useHistory } from "react-router-dom";
 import { previous, next } from "../utils/date-time";
 import { cancelReservation } from "../utils/api";
 import ReservationsList from "../reservations/ReservationsList";
-import ReactModal from "react-modal";
+import Modal from "react-modal";
 
 /**
  * Defines the dashboard page.
@@ -120,7 +120,7 @@ function Dashboard({ date }) {
 
   return (
     <main>
-      <ReactModal isOpen={showPopup} style = {{
+      <Modal isOpen={showPopup} style = {{
         overlay: {
           position: 'fixed',
           top: '25%',
@@ -151,7 +151,7 @@ function Dashboard({ date }) {
           <p style={{textAlign: "center", fontSize: "larger"}}>Please be patient with the tables loading</p>
           <p style={{textAlign: "center"}}>We are using a free DataBase and response times are often slow.</p>
           <button style={{marginLeft: "47%" }} onClick={() => setShowPopup(false)}>Close</button>      
-        </ReactModal>
+        </Modal>
 
 
       <h1>Dashboard</h1>
