@@ -27,7 +27,7 @@ function validType() {
 
         switch (true) {
             case todaysDate > reservationDate:
-                errorMessage = `Reservations must be for the future.`;
+                errorMessage = `Reservations must be for the future.  REQ DATA: ${data.reservation_date}, RES DATE: ${reservationDate}, TODAY DATE: ${todaysDate}`;
                 break;
             case typeof(data.people) !== 'number':
                 errorMessage = 'people must be a number.';
