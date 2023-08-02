@@ -17,7 +17,8 @@ function validType() {
         const reservationTimeHours = reservationTime.slice(0,2);
         const reservationTimeMinutes = reservationTime.slice(3,5);
 
-        const localTime = todaysDate.toLocaleDateString;
+        const localTime = todaysDate.toLocaleDateString();
+        const timeString = todaysDate.toTimeString();
 
 
         let errorMessage = '';
