@@ -17,8 +17,10 @@ function validType() {
         const reservationTimeHours = reservationTime.slice(0,2);
         const reservationTimeMinutes = reservationTime.slice(3,5);
 
-        console.log(reservationDate);
-        console.log(todaysDate);
+        console.log("request data: ", data.reservation_date);
+        console.log("reservation date: ", reservationDate);
+        console.log("today sDate: ", todaysDate);
+
 
 
         let errorMessage = '';
