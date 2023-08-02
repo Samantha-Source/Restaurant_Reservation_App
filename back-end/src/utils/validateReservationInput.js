@@ -17,17 +17,12 @@ function validType() {
         const reservationTimeHours = reservationTime.slice(0,2);
         const reservationTimeMinutes = reservationTime.slice(3,5);
 
-        console.log("request data: ", data.reservation_date);
-        console.log("reservation date: ", reservationDate);
-        console.log("today sDate: ", todaysDate);
-
-
 
         let errorMessage = '';
 
         switch (true) {
             case todaysDate > reservationDate:
-                errorMessage = `Reservations must be for the future.  REQ DATA: ${data.reservation_date}, RES DATE: ${reservationDate}, TODAY DATE: ${todaysDate}`;
+                errorMessage = `Reservations must be for the future.  REQ DATA: ${data.reservation_time}, RES DATE: ${reservationDate}, TODAY DATE: ${todaysDate.toLocaleTimeString}`;
                 break;
             case typeof(data.people) !== 'number':
                 errorMessage = 'people must be a number.';
