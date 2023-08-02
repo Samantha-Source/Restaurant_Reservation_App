@@ -14,7 +14,7 @@ function validType() {
         const todaysDate = new Date();
 
         const localeTodaysDate = new Date();
-        localeTodaysDate.setHours(0, 0, 0, 0);
+        localeTodaysDate.setHours();
 
         const reservationTime = data.reservation_time;
         const reservationTimeHours = reservationTime.slice(0,2);
