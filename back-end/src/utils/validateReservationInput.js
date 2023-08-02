@@ -27,9 +27,9 @@ function validType() {
         let errorMessage = '';
 
         switch (true) {
-            case todaysDate > reservationDate:
-                errorMessage = `REQ DATA: ${data.reservation_time}, reservationDate: ${reservationDate}, localTime: ${localTime}, timeString: ${timeString}, PLEASE: ${localeTodaysDate}`;
-                break;
+            // case todaysDate > reservationDate:
+            //     errorMessage = `REQ DATA: ${data.reservation_time}, reservationDate: ${reservationDate}, localTime: ${localTime}, timeString: ${timeString}, PLEASE: ${localeTodaysDate}`;
+            //     break;
             case typeof(data.people) !== 'number':
                 errorMessage = 'people must be a number.';
                 break;
