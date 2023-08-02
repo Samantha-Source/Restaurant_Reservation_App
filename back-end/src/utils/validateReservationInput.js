@@ -10,7 +10,7 @@ function validType() {
 
 
 
-        const reservationDateTimeString = new Date(`${data.reservation_date}T${data.reservation_time}:00`);
+        const reservationDate = new Date(`${data.reservation_date}T${data.reservation_time}:00`);
         const todaysDate = new Date();
 
         const localeTodaysDate = new Date();
