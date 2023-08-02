@@ -10,9 +10,11 @@ function validType() {
 
 
 
-        const reservationDateUTC = `${data.reservation_date}T${data.reservation_time}:00`;
-        const reservationDate = new Date(reservationDateUTC);
+        const reservationDateTimeString = new Date(`${data.reservation_date}T${data.reservation_time}:00`);
         const todaysDate = new Date();
+
+        const localeTodaysDate = new Date();
+        localeTodaysDate.setHours(0, 0, 0, 0);
 
         const reservationTime = data.reservation_time;
         const reservationTimeHours = reservationTime.slice(0,2);
@@ -26,7 +28,7 @@ function validType() {
 
         switch (true) {
             case todaysDate > reservationDate:
-                errorMessage = `REQ DATA: ${data.reservation_time}, reservationDate: ${reservationDate}, localTime: ${localTime}, timeString: ${timeString}`;
+                errorMessage = `REQ DATA: ${data.reservation_time}, reservationDate: ${reservationDate}, localTime: ${localTime}, timeString: ${timeString}, PLEASE: ${localeTodaysDate}`;
                 break;
             case typeof(data.people) !== 'number':
                 errorMessage = 'people must be a number.';
