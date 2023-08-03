@@ -13,17 +13,16 @@ import Modal from "react-modal";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
+
 function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
   const [showPopup, setShowPopup] = useState(localStorage.getItem("popupShown") !== "true");
-  // const [showPopup, setShowPopup] = useState(true);
 
   let history = useHistory();
   
-
   useEffect(loadDashboard, [date]);
   useEffect(() => {
     localStorage.setItem("popupShown", "true")
@@ -36,11 +35,10 @@ function Dashboard({ date }) {
       .then(setReservations)
       .catch(setReservationsError);
 
-
     return () => abortController.abort();
   }
 
-  useEffect(loadTables, [])
+  useEffect(loadTables, []);
 
   function loadTables() {
     const abortController = new AbortController();
@@ -49,7 +47,6 @@ function Dashboard({ date }) {
       .catch(setTablesError);
     return () => abortController.abort();
   }
-  
 
   function clickPrevious() {
     let previousDay = previous(date)
@@ -118,6 +115,8 @@ function Dashboard({ date }) {
       }
     }
 
+    const dateObject = new Date(parseInt(date.slice(0,4)), parseInt(date.slice(5, 7)) - 1, parseInt(date.slice(8, 10)));
+
   return (
     <main>
       <Modal isOpen={showPopup} style = {{
@@ -126,9 +125,8 @@ function Dashboard({ date }) {
           top: '25%',
           left: '30%',
           right: '30%',
-          bottom: '50%',
-          backgroundColor: 'rgba(244, 196, 137, 0.8)',
-          borderRadius: '10px'
+          bottom: '48%',
+          backgroundColor: 'transparent',
         },
         content: {
           position: 'absolute',
@@ -137,28 +135,28 @@ function Dashboard({ date }) {
           right: '40px',
           bottom: '40px',
           border: '1px solid #ccc',
-          background: '#fff',
+          background: 'rgba(255, 255, 255, .9)',
           borderRadius: '16px',
           outline: '1px',
           padding: '20px',
-          alignItems: "center",
-          justifyContent: "center"
+          textAlign: 'center'
         }
       }
 
       }>
           <h2>Welcome to The Periodic Tables Restaurant Reservation App!</h2>
-          <p style={{textAlign: "center", fontSize: "larger"}}>Please be patient with the tables loading</p>
-          <p style={{textAlign: "center"}}>We are using a free DataBase and response times are often slow.</p>
-          <button style={{marginLeft: "47%" }} onClick={() => setShowPopup(false)}>Close</button>      
-        </Modal>
+          <br></br>
+          <p style={{ textAlign: "center", fontSize: "larger" }}>The "Tables" section is currently experiencing slow loading times. Our team is actively working to improve the performance.</p>
+          <p style={{ textAlign: "center", fontSize: "larger" }}>We apologize for the inconvenience.</p>
+          <button type="button" class="bnt btn-secondary" style={{borderRadius: 10 }} onClick={() => setShowPopup(false)}>Close</button>      
+      </Modal>
 
 
       <h1>Dashboard</h1>
       <hr></hr>
       <br></br>
       <div>
-        <h4>Reservations for {date}</h4>
+        <h4>Reservations for {dateObject.toDateString()}</h4>
       </div>
 
       <ReservationsList

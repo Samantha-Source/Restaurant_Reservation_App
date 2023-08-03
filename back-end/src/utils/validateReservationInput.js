@@ -8,15 +8,11 @@ function validType() {
         // regex to match phone number format
         const rePhone = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/
 
-
-
         const reservationDate = new Date(`${data.reservation_date}T${data.reservation_time}:00`);;
 
         const reservationTime = data.reservation_time;
         const reservationTimeHours = reservationTime.slice(0,2);
         const reservationTimeMinutes = reservationTime.slice(3,5);
-
-
 
         let errorMessage = '';
 

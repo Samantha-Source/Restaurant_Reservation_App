@@ -4,6 +4,15 @@ import ErrorAlert from "../layout/ErrorAlert";
 
 export default function ReservationsList({reservations, reservationsError, handleCancel, date}) {
 
+    const formatTime = ( time ) => {
+      let hh = parseInt(time.slice(0,2));
+      const mm = time.slice(3,5);
+      var suffix = hh >= 12 ? "PM" : "AM";
+
+      hh = ((hh + 11) % 12 + 1);
+
+      return `${hh}:${mm} ${suffix}`;    
+    }
 
     return (
       <main>
@@ -16,7 +25,6 @@ export default function ReservationsList({reservations, reservationsError, handl
               <th>First Name</th>
               <th>Last Name</th>
               <th>Mobile Number</th>
-              <th>Date</th>
               <th>Time</th>
               <th>People</th>
               <th>Status</th>
@@ -32,8 +40,8 @@ export default function ReservationsList({reservations, reservationsError, handl
                 <td>{reservation.first_name}</td>
                 <td>{reservation.last_name}</td>
                 <td>{reservation.mobile_number}</td>
-                <td>{reservation.reservation_date}</td>
-                <td>{reservation.reservation_time}</td>
+                {/* <td>{reservation.reservation_time.slice(0,5)}</td> */}
+                <td>{formatTime(reservation.reservation_time)}</td>
                 <td>{reservation.people}</td>
                 <td data-reservation-id-status={reservation.reservation_id}>{reservation.status}</td>
                 <td>{reservation.status === 'booked' ? 

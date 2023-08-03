@@ -12,8 +12,6 @@ export default function ValidateReservation(reservation) {
     const reservationTimeHours = Number(reservation_time.slice(0,2));
     const reservationTimeMinutes = Number(reservation_time.slice(3,5));
 
-    console.log(`~~fullReservationDate: ${fullReservationDate}, fullTodayDate: ${fullTodayDate}~~`)
-
 
     if(!mobile_number.match(/^[\]?[(]?[0-9]{3}[)]?[-\s\]?[0-9]{3}[-\s\]?[0-9]{4,6}$/)){
         errors.push(`Please enter a valid mobile number.`);
