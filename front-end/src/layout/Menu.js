@@ -1,5 +1,4 @@
-import React from "react";
-
+import React, { useRef } from "react";
 import { Link } from "react-router-dom";
 
 /**
@@ -9,6 +8,9 @@ import { Link } from "react-router-dom";
  */
 
 function Menu() {
+  const windowHeight = useRef(window.innerHeight);
+
+
   return (
     <nav className="navbar navbar-dark align-items-start p-0">
       <div className="container-fluid d-flex flex-column p-0">

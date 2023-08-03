@@ -53,9 +53,9 @@ export default function Search(){
 
 
     return (
-        <main>
+        <main style={{ paddingTop: 50 }}>
         <h3>Search by Phone Number</h3>
-        <hr></hr>
+        <hr style={{ marginTop: 20, marginBottom: 30 }}></hr>
 
         <form name="mobile_number"
         onSubmit={handleSubmit}
@@ -68,6 +68,7 @@ export default function Search(){
             onChange={handleChange}
             value={phoneNumber}
             class="input-field form-control"
+            style={{ width: 350 }}
             />
             <br></br>
             {" "}

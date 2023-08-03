@@ -7,17 +7,10 @@ body {
   
 }
 
-/* body {
-  background-color: #bbada0;
-  background-image: linear-gradient(#e9e4d8, #BBADA0);
-  background-repeat: no-repeat;
-} */
 .side-bar {
   background-color: #393a44;
   min-width: 200px;
   max-width: 100%;
-  height: auto;
-
 }
 
 h1 {
