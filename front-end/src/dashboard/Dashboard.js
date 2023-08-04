@@ -23,6 +23,8 @@ function Dashboard({ date }) {
 
   let history = useHistory();
   
+  useEffect(loadTables, []);
+
   useEffect(loadDashboard, [date]);
   useEffect(() => {
     localStorage.setItem("popupShown", "true")
@@ -38,7 +40,7 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
-  useEffect(loadTables, []);
+ 
 
   function loadTables() {
     const abortController = new AbortController();
@@ -191,7 +193,7 @@ function Dashboard({ date }) {
       <ErrorAlert error={tablesError} />
       <table className = "table">
         <thead>
-          <tr>
+          <tr style={{textDecoration: 'underline'}}>
             <th>Table Name</th>
             <th>Capacity</th>
             <th>Status</th>
